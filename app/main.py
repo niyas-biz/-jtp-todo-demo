@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
+from datetime import datetime
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import FileResponse
@@ -34,7 +35,11 @@ def list_todos(db: Session = Depends(get_db)) -> list[Todo]:
 
 @app.post("/api/todos", response_model=TodoOut, status_code=201)
 def create_todo(payload: TodoCreate, db: Session = Depends(get_db)) -> Todo:
-    todo = Todo(title=payload.title.strip(), description=payload.description.strip())
+    todo = Todo(
+        title=payload.title.strip(),
+        description=payload.description.strip(),
+        due_date=payload.due_date,
+    )
     db.add(todo)
     db.commit()
     db.refresh(todo)
