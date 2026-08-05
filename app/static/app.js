@@ -30,6 +30,7 @@ function render(todos) {
       <div>
         <p class="title"></p>
         <p class="notes"></p>
+        <p class="due-date"></p>
       </div>
       <div class="actions">
         <button type="button" class="secondary edit">Edit</button>
@@ -38,6 +39,7 @@ function render(todos) {
     `;
     li.querySelector(".title").textContent = todo.title;
     li.querySelector(".notes").textContent = todo.description || "";
+    li.querySelector(".due-date").textContent = todo.due_date ? `Due: ${new Date(todo.due_date).toLocaleDateString()}` : "";
 
     li.querySelector('input[type="checkbox"]').addEventListener("change", async (e) => {
       await api(`/api/todos/${todo.id}`, {
@@ -52,9 +54,13 @@ function render(todos) {
       if (title === null || !title.trim()) return;
       const description = prompt("Notes", todo.description || "");
       if (description === null) return;
+      const dueDateInput = prompt("Due date (YYYY-MM-DD)", todo.due_date ? todo.due_date.substring(0, 10) : "");
+      if (dueDateInput === null) return;
+      let due_date = dueDateInput.trim() || null;
+      if (due_date === "") due_date = null;
       await api(`/api/todos/${todo.id}`, {
         method: "PATCH",
-        body: JSON.stringify({ title: title.trim(), description }),
+        body: JSON.stringify({ title: title.trim(), description, due_date }),
       });
       await load();
     });
@@ -78,10 +84,11 @@ formEl.addEventListener("submit", async (e) => {
   e.preventDefault();
   const title = document.getElementById("title").value.trim();
   const description = document.getElementById("description").value.trim();
+  const due_date = document.getElementById("due_date").value || null;
   if (!title) return;
   await api("/api/todos", {
     method: "POST",
-    body: JSON.stringify({ title, description }),
+    body: JSON.stringify({ title, description, due_date }),
   });
   formEl.reset();
   await load();
