@@ -188,6 +188,26 @@ button.danger {
   display: none;
 }
 
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.edit-form input[type="text"],
+.edit-form input[type="date"] {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+
+.edit-form button {
+  width: 80px;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+}
+
 @media (max-width: 720px) {
   #todo-form {
     grid-template-columns: 1fr;
@@ -199,5 +219,9 @@ button.danger {
 
   .actions {
     grid-column: 1 / -1;
+  }
+
+  .edit-form {
+    flex-direction: column;
   }
 }

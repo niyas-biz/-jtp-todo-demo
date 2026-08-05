@@ -1,52 +1,40 @@
-PLAN.md
-
-# Plan for TODO-7: Add a Due Date Field to Todos
+# Plan for TODO-14: Improve the todo edit UI
 
 ## Summary
-Add an optional `due_date` field to the Todo model and API. The field will be an ISO date string. The UI will show the due date in the todo list. Pytest coverage will be updated to test the new field.
+Improve editing in the todo UI to use inline editing with Save and Cancel buttons instead of prompt dialogs. After saving, update the list without a full page reload. Keep create, complete, and delete functionality working.
 
-## Details
+## Changes
 
-### Backend Changes
-1. **Model Update (app/models.py)**
-   - Add a new optional `due_date` field of type `datetime | None` to the `Todo` SQLAlchemy model.
-   - Use `DateTime` column type with timezone support and nullable=True.
+### app/static/app.js
+- Replace the current prompt-based edit flow with inline editing UI.
+- When Edit is clicked, replace the todo text with input fields for title, description, and due date.
+- Show Save and Cancel buttons in place of Edit and Delete while editing.
+- On Save, send PATCH request to update the todo, then reload the list.
+- On Cancel, revert to the original display without saving.
+- Keep complete (checkbox) and delete functionality unchanged.
 
-2. **Schema Update (app/schemas.py)**
-   - Add `due_date` as an optional ISO date string field to the Pydantic models:
-     - Add to `TodoCreate` as optional (default None).
-     - Add to `TodoUpdate` as optional (default None).
-     - Add to `TodoOut` as optional.
+### app/static/styles.css
+- Add styles for inline edit inputs and buttons to fit the existing UI style.
 
-3. **API Update (app/main.py)**
-   - Update the create and update endpoints to accept and handle the `due_date` field.
-   - Ensure the field is stripped/validated as needed.
-   - Return the `due_date` in the response.
+### app/static/index.html
+- No structural changes needed since inline editing is done dynamically in JS.
 
-### Frontend Changes
-1. **UI Update (app/static/index.html and app/static/app.js)**
-   - Add an input field for due date in the todo creation form (type="date").
-   - Display the due date in the todo list items.
-   - Update the JavaScript to send the due date when creating or updating todos.
-   - Show due date in a readable format in the list.
+### tests/test_todos.py
+- Add a UI test for inline editing:
+  - Create a todo.
+  - Click Edit and verify input fields appear.
+  - Change title and description.
+  - Click Save.
+  - Verify the updated todo appears in the list.
+  - Verify create, complete, and delete still work.
 
-### Tests (tests/test_todos.py)
-1. Add tests to cover:
-   - Creating a todo with a due date.
-   - Updating a todo's due date.
-   - Retrieving todos with due dates.
-   - UI tests if applicable (currently no UI tests, so focus on API tests).
+## Testing
+- Run existing pytest tests.
+- Run new UI test for inline editing.
+- Fix any test failures before finishing.
 
 ## Acceptance Criteria
-- Todos can store and return `due_date`.
-- UI shows the due date.
-- All pytest tests pass.
-
-## Notes
-- Keep changes minimal and consistent with existing code style.
-- Use ISO 8601 date strings for due_date in API and UI.
-- Due date is optional; todos without due date should behave as before.
-
----
-
-This plan will guide the implementation of the due date feature for todos.
+- Inline edit with Save/Cancel works.
+- List updates after save without full page reload.
+- Create, complete, and delete still work.
+- Pytest passes.
