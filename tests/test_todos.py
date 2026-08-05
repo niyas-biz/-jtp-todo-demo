@@ -1,17 +1,46 @@
-import os
-from pathlib import Path
-
 import pytest
 from fastapi.testclient import TestClient
+
+from app.main import app
+
+
+def test_ui_edit_inline(client: TestClient):
+    # Create a todo
+    res = client.post("/api/todos", json={"title": "Test inline edit", "description": "desc"})
+    assert res.status_code == 201
+    todo = res.json()
+
+    # Get the main page
+    res = client.get("/")
+    assert res.status_code == 200
+
+    # We cannot expect the todo title or edit button in the static HTML because it's rendered by JS
+
+    # We cannot fully test JS inline editing here without a browser environment,
+    # but we can assert the presence of the edit form elements in the JS source
+    js_res = client.get("/static/app.js")
+    assert js_res.status_code == 200
+    js_text = js_res.text
+    assert "createEditForm" in js_text
+    assert "Save" in js_text
+    assert "Cancel" in js_text
+
+
+@pytest.fixture()
+def client():
+    from app.main import app
+    from fastapi.testclient import TestClient
+    return TestClient(app)
+
+
+# Existing tests below
+
+import os
+from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-
-# Use in-memory DB for tests before importing app.db engine usage via override
-os.environ.setdefault("TODO_TEST_MODE", "1")
-
 from app.db import Base, get_db
-from app.main import app
 
 
 @pytest.fixture()
