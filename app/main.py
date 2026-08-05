@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException
@@ -9,13 +10,16 @@ from app.db import get_db, init_db
 from app.models import Todo
 from app.schemas import TodoCreate, TodoOut, TodoUpdate
 
-app = FastAPI(title="JTP Todo Demo", version="0.1.0")
 STATIC_DIR = Path(__file__).parent / "static"
 
 
-@app.on_event("startup")
-def on_startup() -> None:
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
     init_db()
+    yield
+
+
+app = FastAPI(title="JTP Todo Demo", version="0.1.0", lifespan=lifespan)
 
 
 @app.get("/api/health")
