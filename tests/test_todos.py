@@ -70,3 +70,31 @@ def test_ui_served(client: TestClient) -> None:
     res = client.get("/")
     assert res.status_code == 200
     assert "Todo Demo" in res.text
+
+
+def test_todos_filter_completed(client: TestClient) -> None:
+    # Create two todos
+    todo1 = client.post("/api/todos", json={"title": "Task 1", "description": "Desc 1"}).json()
+    todo2 = client.post("/api/todos", json={"title": "Task 2", "description": "Desc 2"}).json()
+
+    # Mark one as completed
+    client.patch(f"/api/todos/{todo1['id']}", json={"completed": True})
+
+    # Assert GET /api/todos returns 2
+    res_all = client.get("/api/todos")
+    assert res_all.status_code == 200
+    assert len(res_all.json()) == 2
+
+    # Assert GET /api/todos?completed=true returns 1 completed
+    res_completed = client.get("/api/todos?completed=true")
+    assert res_completed.status_code == 200
+    completed_todos = res_completed.json()
+    assert len(completed_todos) == 1
+    assert completed_todos[0]["completed"] is True
+
+    # Assert GET /api/todos?completed=false returns 1 incomplete
+    res_incomplete = client.get("/api/todos?completed=false")
+    assert res_incomplete.status_code == 200
+    incomplete_todos = res_incomplete.json()
+    assert len(incomplete_todos) == 1
+    assert incomplete_todos[0]["completed"] is False

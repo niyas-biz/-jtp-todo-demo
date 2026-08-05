@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
@@ -28,8 +28,13 @@ def health() -> dict[str, str]:
 
 
 @app.get("/api/todos", response_model=list[TodoOut])
-def list_todos(db: Session = Depends(get_db)) -> list[Todo]:
-    return db.query(Todo).order_by(Todo.id.desc()).all()
+def list_todos(completed: bool | None = Query(default=None), db: Session = Depends(get_db)) -> list[Todo]:
+    query = db.query(Todo)
+    if completed is True:
+        query = query.filter(Todo.completed.is_(True))
+    elif completed is False:
+        query = query.filter(Todo.completed.is_(False))
+    return query.order_by(Todo.id.desc()).all()
 
 
 @app.post("/api/todos", response_model=TodoOut, status_code=201)
