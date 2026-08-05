@@ -1,0 +1,203 @@
+:root {
+  --ink: #1c2416;
+  --muted: #5d6b52;
+  --paper: #f3efe4;
+  --card: #fffdf7;
+  --line: #d7d0bf;
+  --accent: #2f6a3a;
+  --accent-ink: #f7fff6;
+  --danger: #8a2f2f;
+  --shadow: 0 18px 50px rgba(40, 48, 30, 0.08);
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-body: "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  font-family: var(--font-body);
+  background:
+    radial-gradient(circle at top left, rgba(47, 106, 58, 0.12), transparent 35%),
+    linear-gradient(180deg, #efe8d8 0%, var(--paper) 45%, #e7efdf 100%);
+}
+
+.page {
+  width: min(760px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 3rem 0 4rem;
+}
+
+.hero {
+  margin-bottom: 2rem;
+}
+
+.brand {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  line-height: 0.95;
+  font-weight: 600;
+}
+
+.lede {
+  margin: 1rem 0 0;
+  max-width: 36rem;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.composer,
+.list-wrap {
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.composer {
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+#todo-form {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: 1.2fr 1fr auto;
+  align-items: end;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+input {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  padding: 0.8rem 0.9rem;
+  font: inherit;
+}
+
+button {
+  border: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 0.85rem 1.1rem;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+button.danger {
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid rgba(138, 47, 47, 0.35);
+}
+
+.list-wrap {
+  padding: 1.25rem;
+}
+
+.list-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1rem;
+}
+
+.list-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+}
+
+#count {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+#todo-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.todo {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.9rem;
+  align-items: start;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--line);
+  background: #fffcf5;
+}
+
+.todo.done .title {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+
+.notes {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.empty {
+  margin: 0;
+  color: var(--muted);
+}
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  #todo-form {
+    grid-template-columns: 1fr;
+  }
+
+  .todo {
+    grid-template-columns: auto 1fr;
+  }
+
+  .actions {
+    grid-column: 1 / -1;
+  }
+}

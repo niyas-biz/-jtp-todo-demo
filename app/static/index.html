@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Todo Demo</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <p class="brand">Todo Demo</p>
+        <h1>Keep the next thing clear.</h1>
+        <p class="lede">Add, complete, edit, and delete tasks. Built for Jira-to-PR smoke tests.</p>
+      </header>
+
+      <section class="composer" aria-label="Add todo">
+        <form id="todo-form">
+          <label>
+            Title
+            <input id="title" name="title" maxlength="200" required placeholder="Buy milk" />
+          </label>
+          <label>
+            Notes
+            <input id="description" name="description" maxlength="1000" placeholder="Optional details" />
+          </label>
+          <button type="submit">Add task</button>
+        </form>
+      </section>
+
+      <section class="list-wrap" aria-label="Todo list">
+        <div class="list-head">
+          <h2>Tasks</h2>
+          <span id="count">0 open</span>
+        </div>
+        <ul id="todo-list"></ul>
+        <p id="empty" class="empty hidden">No tasks yet. Add one above.</p>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
