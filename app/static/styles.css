@@ -150,13 +150,14 @@ button.danger {
 
 .todo {
   display: grid;
-  grid-template-columns: 50px 30px minmax(0, 1fr) auto;
-  gap: 1.2rem;
-  align-items: center;
-  padding: 0.95rem 1rem;
-  border: 1px solid var(--line);
-  background: #fffcf5;
-  min-width: 0;
+-  grid-template-columns: 50px 30px minmax(0, 1fr) auto;
++  grid-template-columns: 30px 30px minmax(0, 1fr) auto;
+   gap: 1.2rem;
+   align-items: center;
+   padding: 0.95rem 1rem;
+   border: 1px solid var(--line);
+   background: #fffcf5;
+   min-width: 0;
 }
 
 .todo input[type="checkbox"] {
@@ -226,7 +227,8 @@ button.danger {
   }
 
   .todo {
-    grid-template-columns: auto 1fr;
+-    grid-template-columns: auto 1fr;
++    grid-template-columns: 30px 1fr;
   }
 
   .actions {
