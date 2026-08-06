@@ -94,6 +94,18 @@ def delete_todo(todo_id: int, db: Session = Depends(get_db)) -> None:
     db.commit()
 
 
+@app.post("/api/todos/bulk_delete", status_code=204)
+def bulk_delete_todos(ids: list[int], db: Session = Depends(get_db)) -> None:
+    if not ids:
+        return
+    todos = db.query(Todo).filter(Todo.id.in_(ids)).all()
+    if not todos:
+        return
+    for todo in todos:
+        db.delete(todo)
+    db.commit()
+
+
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
