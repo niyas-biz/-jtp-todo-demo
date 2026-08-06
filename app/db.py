@@ -26,12 +26,17 @@ def init_db() -> None:
 
     Base.metadata.create_all(bind=engine)
 
-    # Fix any NULL values in completed column by setting them to False
     with engine.connect() as conn:
-        # Check if completed column exists
+        # Check columns in todos table
         result = conn.execute(text("PRAGMA table_info(todos);"))
         columns = [row[1] for row in result]
+
+        # Add due_date column if missing
+        if "due_date" not in columns:
+            conn.execute(text("ALTER TABLE todos ADD COLUMN due_date DATETIME;"))
+
+        # Fix any NULL values in completed column by setting them to False
         if "completed" in columns:
-            # Update NULL completed values to False
             conn.execute(text("UPDATE todos SET completed = 0 WHERE completed IS NULL;"))
-            conn.commit()
+
+        conn.commit()
