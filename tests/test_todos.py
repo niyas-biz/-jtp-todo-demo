@@ -1,7 +1,10 @@
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 
 from app.main import app
+from app.db import engine
 
 
 @pytest.fixture()
@@ -150,3 +153,26 @@ def test_internal_server_error_handling() -> None:
         res = client.get("/api/error")
         assert res.status_code == 500
         assert res.json() == {"detail": "Internal Server Error"}
+
+
+def test_null_completed_handling(client: TestClient) -> None:
+    # Attempt to insert a todo with NULL completed using raw SQL
+    with engine.connect() as conn:
+        try:
+            conn.execute(text("INSERT INTO todos (title, description, completed) VALUES ('Null Completed', 'desc', NULL);"))
+            conn.commit()
+        except IntegrityError:
+            # Expected due to NOT NULL constraint
+            pass
+
+    # The init_db fix should update NULL completed to False if any exist
+    from app.db import init_db
+    init_db()
+
+    # Fetch todos and verify no NULL completed
+    res = client.get("/api/todos")
+    assert res.status_code == 200
+    todos = res.json()
+    # There should be no todos with NULL completed
+    for todo in todos:
+        assert todo["completed"] is not None
