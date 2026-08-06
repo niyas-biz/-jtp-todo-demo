@@ -1,46 +1,30 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Todo Demo</title>
-    <link rel="stylesheet" href="/static/styles.css" />
-  </head>
-  <body>
-    <main class="page">
-      <header class="hero">
-        <p class="brand">Todo Demo <span id="total-count" class="badge">0</span></p>
-        <h1>Keep the next thing clear.</h1>
-        <p class="lede">Add, complete, edit, and delete tasks. Built for Jira-to-PR smoke tests.</p>
-      </header>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Todo Demo</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <h1>Todo Demo</h1>
 
-      <section class="composer" aria-label="Add todo">
-        <form id="todo-form">
-          <label>
-            Title
-            <input id="title" name="title" maxlength="200" required placeholder="Buy milk" />
-          </label>
-          <label>
-            Notes
-            <input id="description" name="description" maxlength="1000" placeholder="Optional details" />
-          </label>
-          <label>
-            Due date
-            <input id="due_date" name="due_date" type="date" />
-          </label>
-          <button type="submit">Add task</button>
-        </form>
-      </section>
+  <form id="todo-form">
+    <input id="title" type="text" placeholder="Title" maxlength="200" required />
+    <input id="description" type="text" placeholder="Description" maxlength="1000" />
+    <input id="due_date" type="date" />
+    <button type="submit">Add Todo</button>
+  </form>
 
-      <section class="list-wrap" aria-label="Todo list">
-        <div class="list-head">
-          <h2>Tasks</h2>
-          <span id="count">0 open</span>
-        </div>
-        <ul id="todo-list"></ul>
-        <p id="empty" class="empty hidden">No tasks yet. Add one above.</p>
-      </section>
-    </main>
-    <script src="/static/app.js"></script>
-  </body>
+  <div id="bulk-actions" class="hidden">
+    <button id="bulk-delete-btn" class="danger">Delete Selected</button>
+  </div>
+
+  <p id="count"></p>
+  <p id="empty" class="hidden">No todos found.</p>
+  <ul id="todo-list"></ul>
+  <p>Total todos: <span id="total-count" class="badge">0</span></p>
+
+  <script src="/static/app.js"></script>
+</body>
 </html>

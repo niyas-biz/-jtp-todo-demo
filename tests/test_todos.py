@@ -176,3 +176,57 @@ def test_null_completed_handling(client: TestClient) -> None:
     # There should be no todos with NULL completed
     for todo in todos:
         assert todo["completed"] is not None
+
+# New tests for bulk delete
+
+def test_bulk_delete(client: TestClient) -> None:
+    # Create multiple todos
+    todos = []
+    for i in range(3):
+        res = client.post("/api/todos", json={"title": f"Bulk {i}", "description": "desc"})
+        assert res.status_code == 201
+        todos.append(res.json())
+
+    ids = [t["id"] for t in todos]
+
+    # Bulk delete all
+    res = client.post("/api/todos/bulk_delete", json=ids)
+    assert res.status_code == 204
+
+    # Verify all deleted
+    res = client.get("/api/todos")
+    remaining_ids = [t["id"] for t in res.json()]
+    for id_ in ids:
+        assert id_ not in remaining_ids
+
+
+def test_bulk_delete_some_invalid(client: TestClient) -> None:
+    # Create todos
+    res1 = client.post("/api/todos", json={"title": "Valid 1", "description": "desc"})
+    res2 = client.post("/api/todos", json={"title": "Valid 2", "description": "desc"})
+    assert res1.status_code == 201
+    assert res2.status_code == 201
+
+    valid_ids = [res1.json()["id"], res2.json()["id"]]
+    invalid_ids = [9999, 10000]
+
+    # Bulk delete with some invalid IDs
+    res = client.post("/api/todos/bulk_delete", json=valid_ids + invalid_ids)
+    assert res.status_code == 204
+
+    # Verify valid todos deleted
+    res = client.get("/api/todos")
+    remaining_ids = [t["id"] for t in res.json()]
+    for id_ in valid_ids:
+        assert id_ not in remaining_ids
+
+
+def test_bulk_delete_empty_list(client: TestClient) -> None:
+    res = client.post("/api/todos/bulk_delete", json=[])
+    assert res.status_code == 204
+
+    # Should not affect existing todos
+    res = client.post("/api/todos", json={"title": "Keep me", "description": "desc"})
+    assert res.status_code == 201
+    res2 = client.get("/api/todos")
+    assert any(t["title"] == "Keep me" for t in res2.json())

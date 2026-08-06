@@ -4,6 +4,10 @@ const countEl = document.getElementById("count");
 const totalCountEl = document.getElementById("total-count");
 const formEl = document.getElementById("todo-form");
 
+// New element for bulk actions
+const bulkActionsEl = document.getElementById("bulk-actions");
+const bulkDeleteBtn = document.getElementById("bulk-delete-btn");
+
 async function api(path, options = {}) {
   const res = await fetch(path, {
     headers: { "Content-Type": "application/json", ...(options.headers || {}) },
@@ -77,12 +81,26 @@ function createEditForm(todo, li) {
   return div;
 }
 
+// Track selected todo IDs for bulk operations
+const selectedIds = new Set();
+
+function updateBulkActionsVisibility() {
+  if (selectedIds.size > 0) {
+    bulkActionsEl.classList.remove("hidden");
+  } else {
+    bulkActionsEl.classList.add("hidden");
+  }
+}
+
 function render(todos) {
   listEl.innerHTML = "";
   const open = todos.filter((t) => !t.completed).length;
   countEl.textContent = `${open} open`;
   totalCountEl.textContent = todos.length;
   emptyEl.classList.toggle("hidden", todos.length > 0);
+
+  // Clear selected IDs on reload
+  selectedIds.clear();
 
   for (const todo of todos) {
     const li = document.createElement("li");
@@ -93,6 +111,7 @@ function render(todos) {
       li.appendChild(editForm);
     } else {
       li.innerHTML = `
+        <input type="checkbox" class="select-todo" data-id="${todo.id}" aria-label="Select todo" />
         <input type="checkbox" ${todo.completed ? "checked" : ""} aria-label="Toggle complete" />
         <div>
           <p class="title"></p>
@@ -108,7 +127,19 @@ function render(todos) {
       li.querySelector(".notes").textContent = todo.description || "";
       li.querySelector(".due-date").textContent = todo.due_date ? `Due: ${new Date(todo.due_date).toLocaleDateString()}` : "";
 
-      li.querySelector('input[type="checkbox"]').addEventListener("change", async (e) => {
+      // Bulk select checkbox
+      const selectCheckbox = li.querySelector('.select-todo');
+      selectCheckbox.addEventListener("change", (e) => {
+        const id = Number(e.target.dataset.id);
+        if (e.target.checked) {
+          selectedIds.add(id);
+        } else {
+          selectedIds.delete(id);
+        }
+        updateBulkActionsVisibility();
+      });
+
+      li.querySelector('input[type="checkbox"]:not(.select-todo)').addEventListener("change", async (e) => {
         await api(`/api/todos/${todo.id}`, {
           method: "PATCH",
           body: JSON.stringify({ completed: e.target.checked }),
@@ -130,7 +161,23 @@ function render(todos) {
 
     listEl.appendChild(li);
   }
+
+  updateBulkActionsVisibility();
 }
+
+bulkDeleteBtn.addEventListener("click", async () => {
+  if (selectedIds.size === 0) return;
+  if (!confirm(`Delete ${selectedIds.size} selected tasks?`)) return;
+  try {
+    await api("/api/todos/bulk_delete", {
+      method: "POST",
+      body: JSON.stringify(Array.from(selectedIds)),
+    });
+    await load();
+  } catch (err) {
+    alert(`Failed to delete tasks: ${err.message}`);
+  }
+});
 
 async function load() {
   const todos = await api("/api/todos");
