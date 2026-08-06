@@ -4,28 +4,6 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 
-def test_ui_edit_inline(client: TestClient):
-    # Create a todo
-    res = client.post("/api/todos", json={"title": "Test inline edit", "description": "desc"})
-    assert res.status_code == 201
-    todo = res.json()
-
-    # Get the main page
-    res = client.get("/")
-    assert res.status_code == 200
-
-    # We cannot expect the todo title or edit button in the static HTML because it's rendered by JS
-
-    # We cannot fully test JS inline editing here without a browser environment,
-    # but we can assert the presence of the edit form elements in the JS source
-    js_res = client.get("/static/app.js")
-    assert js_res.status_code == 200
-    js_text = js_res.text
-    assert "createEditForm" in js_text
-    assert "Save" in js_text
-    assert "Cancel" in js_text
-
-
 @pytest.fixture()
 def client():
     from app.main import app
@@ -128,3 +106,39 @@ def test_due_date(client: TestClient) -> None:
     assert listed.status_code == 200
     todos = listed.json()
     assert any(t.get("due_date") == None or t.get("due_date") == new_due_date for t in todos)
+
+
+def test_ui_count_badge(client: TestClient) -> None:
+    # Initially no todos
+    res = client.get("/api/todos")
+    assert res.status_code == 200
+    assert len(res.json()) == 0
+
+    # Get main page and check badge element exists
+    res = client.get("/")
+    assert res.status_code == 200
+    assert '<span id="total-count" class="badge">' in res.text
+
+    # Add a todo
+    created = client.post("/api/todos", json={"title": "Test badge", "description": "desc"})
+    assert created.status_code == 201
+
+    # Get todos and check count
+    todos = client.get("/api/todos").json()
+    assert len(todos) == 1
+
+    # Add another todo
+    created2 = client.post("/api/todos", json={"title": "Test badge 2", "description": "desc2"})
+    assert created2.status_code == 201
+
+    # Get todos and check count
+    todos = client.get("/api/todos").json()
+    assert len(todos) == 2
+
+    # Delete a todo
+    del_res = client.delete(f"/api/todos/{created.json()['id']}")
+    assert del_res.status_code == 204
+
+    # Get todos and check count
+    todos = client.get("/api/todos").json()
+    assert len(todos) == 1

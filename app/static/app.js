@@ -1,6 +1,7 @@
 const listEl = document.getElementById("todo-list");
 const emptyEl = document.getElementById("empty");
 const countEl = document.getElementById("count");
+const totalCountEl = document.getElementById("total-count");
 const formEl = document.getElementById("todo-form");
 
 async function api(path, options = {}) {
@@ -80,6 +81,7 @@ function render(todos) {
   listEl.innerHTML = "";
   const open = todos.filter((t) => !t.completed).length;
   countEl.textContent = `${open} open`;
+  totalCountEl.textContent = todos.length;
   emptyEl.classList.toggle("hidden", todos.length > 0);
 
   for (const todo of todos) {
