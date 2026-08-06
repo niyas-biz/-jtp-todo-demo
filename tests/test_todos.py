@@ -142,3 +142,11 @@ def test_ui_count_badge(client: TestClient) -> None:
     # Get todos and check count
     todos = client.get("/api/todos").json()
     assert len(todos) == 1
+
+
+def test_internal_server_error_handling() -> None:
+    # Use a TestClient with raise_server_exceptions=False to capture error response
+    with TestClient(app, raise_server_exceptions=False) as client:
+        res = client.get("/api/error")
+        assert res.status_code == 500
+        assert res.json() == {"detail": "Internal Server Error"}

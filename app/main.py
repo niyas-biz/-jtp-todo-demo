@@ -1,9 +1,10 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
 from datetime import datetime
+import logging
 
-from fastapi import Depends, FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
@@ -21,6 +22,19 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="JTP Todo Demo", version="0.1.0", lifespan=lifespan)
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Unhandled error: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal Server Error"},
+    )
 
 
 @app.get("/api/health")
@@ -86,3 +100,8 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 @app.get("/")
 def index() -> FileResponse:
     return FileResponse(STATIC_DIR / "index.html")
+
+# Add a test-only endpoint to simulate internal server error
+@app.get("/api/error")
+def error_endpoint():
+    raise RuntimeError("Simulated internal error")
