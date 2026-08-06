@@ -7,23 +7,25 @@
   <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
-  <h1>Todo Demo</h1>
+  <main class="page">
+    <h1>Todo Demo</h1>
 
-  <form id="todo-form">
-    <input id="title" type="text" placeholder="Title" maxlength="200" required />
-    <input id="description" type="text" placeholder="Description" maxlength="1000" />
-    <input id="due_date" type="date" />
-    <button type="submit">Add Todo</button>
-  </form>
+    <form id="todo-form">
+      <input id="title" type="text" placeholder="Title" maxlength="200" required />
+      <input id="description" type="text" placeholder="Description" maxlength="1000" />
+      <input id="due_date" type="date" />
+      <button type="submit">Add Todo</button>
+    </form>
 
-  <div id="bulk-actions" class="hidden">
-    <button id="bulk-delete-btn" class="danger">Delete Selected</button>
-  </div>
+    <div id="bulk-actions" class="hidden">
+      <button id="bulk-delete-btn" class="danger" type="button">Delete Selected</button>
+    </div>
 
-  <p id="count"></p>
-  <p id="empty" class="hidden">No todos found.</p>
-  <ul id="todo-list"></ul>
-  <p>Total todos: <span id="total-count" class="badge">0</span></p>
+    <p id="count"></p>
+    <p id="empty" class="hidden">No todos found.</p>
+    <ul id="todo-list"></ul>
+    <p>Total todos: <span id="total-count" class="badge">0</span></p>
+  </main>
 
   <script src="/static/app.js"></script>
 </body>
